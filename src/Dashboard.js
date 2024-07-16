@@ -79,15 +79,15 @@ const Dashboard = () => {
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
         <div style={{ }}>
           <h3>Umidade</h3>
-          <RadialGauge value={lastReading.humidity}/>
+          <RadialGauge value={lastReading.umidade}/>
         </div>
         <div>
           <h3>Temperatura</h3>
-          <RadialGauge value={lastReading.temperature} />
+          <RadialGauge value={lastReading.temperatura} />
         </div>
         <div>
           <h3>Luz</h3>
-          <RadialGauge value={lastReading.lightLevel} />
+          <RadialGauge value={lastReading.luz} />
         </div>
       </div>
 
@@ -99,9 +99,9 @@ const Dashboard = () => {
           <YAxis />
           <Tooltip />
           <Legend />
-          <Line type="monotone" dataKey="humidity" stroke="#8884d8" />
-          <Line type="monotone" dataKey="temperature" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="lightLevel" stroke="#ffc658" />
+          <Line type="monotone" dataKey="umidade" stroke="#8884d8" />
+          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" />
+          <Line type="monotone" dataKey="luz" stroke="#ffc658" />
         </LineChart>
       </ResponsiveContainer>
     </div>
