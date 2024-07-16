@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchLastReading = async () => {
-        fetch('/data/last')
+        fetch('https://esp32-data-api-1.onrender.com/data/last')
         .then(response => {
           if (!response.ok) {
             throw new Error('Erro na requisição HTTP: ' + response.status);
@@ -37,7 +37,7 @@ const Dashboard = () => {
     };
 
     const fetchAllReadings = async () => {
-        fetch('/data')
+        fetch('https://esp32-data-api-1.onrender.com/data')
         .then(response => {
           if (!response.ok) {
             throw new Error('Erro na requisição HTTP: ' + response.status);
