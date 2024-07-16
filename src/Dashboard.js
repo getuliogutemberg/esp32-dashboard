@@ -81,6 +81,7 @@ const Dashboard = () => {
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
           nrOfLevels={20}
+          animate={false}
           formatTextValue={value => `${value} %H`}
           percent={lastReading.umidade/100}
            />
@@ -89,6 +90,7 @@ const Dashboard = () => {
           <h3>Temperatura</h3>
           <GaugeChart id="gauge-temperature"
           nrOfLevels={20} 
+          animate={false}
           formatTextValue={value => `${value} °C`}
           percent={lastReading.temperatura/100}
           />
