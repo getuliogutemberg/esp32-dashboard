@@ -1,6 +1,7 @@
 // src/Dashboard.js
 import React, { useEffect, useState } from 'react';
 import GaugeChart from 'react-gauge-chart'
+import axios from 'axios';
 import {
   LineChart,
   Line,
@@ -18,8 +19,9 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchLastReading = async () => {
-        fetch('https://esp32-data-api-1.onrender.com/data/last')
+        axios.get("https://esp32-data-api-1.onrender.com/data/last")
         .then(response => {
+            console.log(response.data)
           if (!response.ok) {
             throw new Error('Erro na requisição HTTP: ' + response.status);
           }
@@ -27,7 +29,7 @@ const Dashboard = () => {
           return response.json();
         })
         .then(data => {
-          console.log('Última leitura:', data);
+          console.log('Última leitura:', data);
           setLastReading(data);
           // Aqui você pode processar os dados recebidos
         })
@@ -37,15 +39,16 @@ const Dashboard = () => {
     };
 
     const fetchAllReadings = async () => {
-        fetch('https://esp32-data-api-1.onrender.com/data')
+        axios.get("https://esp32-data-api-1.onrender.com/data")
         .then(response => {
           if (!response.ok) {
             throw new Error('Erro na requisição HTTP: ' + response.status);
           }
+          
           return response.json();
         })
         .then(data => {
-          console.log('Todas as leituras:', data);
+          console.log('Leituras:', data);
           setAllReadings(data);
           // Aqui você pode processar os dados recebidos
         })
