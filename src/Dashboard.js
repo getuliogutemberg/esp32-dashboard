@@ -19,50 +19,29 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchLastReading = async () => {
-        axios.get("https://esp32-data-api-1.onrender.com/data/last")
-        .then(response => {
-            console.log(response.data)
-          if (!response.ok) {
-            throw new Error('Erro na requisição HTTP: ' + response.status);
-          }
-          
-          return response.json();
-        })
-        .then(data => {
-          console.log('Última leitura:', data);
-          setLastReading(data);
-          // Aqui você pode processar os dados recebidos
-        })
-        .catch(error => {
-          console.error('Erro ao buscar dados:', error);
-        });
+      try {
+        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+        console.log('Última leitura:', response.data);
+        setLastReading(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar última leitura:', error);
+      }
     };
 
     const fetchAllReadings = async () => {
-        axios.get("https://esp32-data-api-1.onrender.com/data")
-        .then(response => {
-          if (!response.ok) {
-            throw new Error('Erro na requisição HTTP: ' + response.status);
-          }
-          
-          return response.json();
-        })
-        .then(data => {
-          console.log('Leituras:', data);
-          setAllReadings(data);
-          // Aqui você pode processar os dados recebidos
-        })
-        .catch(error => {
-          console.error('Erro ao buscar dados:', error);
-        });
+      try {
+        const response = await axios.get("https://esp32-data-api-1.onrender.com/data");
+        console.log('Leituras:', response.data);
+        setAllReadings(response.data);
+      } catch (error) {
+        console.error('Erro ao buscar todas as leituras:', error);
+      }
     };
 
     fetchLastReading();
     fetchAllReadings();
 
     // Aqui você pode adicionar ou lidar com o setInterval para buscar novos dados
-
-    // Por exemplo:
 
     const interval = setInterval(() => {
       fetchLastReading();
@@ -80,56 +59,35 @@ const Dashboard = () => {
     <div>
       <h1>ESP32 Sensor Dashboard</h1>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
-        <div style={{ }}>
+        <div>
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
-          nrOfLevels={20}
-          animate={false}
-          formatTextValue={value => `${value} %H`}
-          percent={lastReading.umidade/100}
-           />
+            nrOfLevels={20}
+            animate={false}
+            formatTextValue={value => `${value} %H`}
+            percent={lastReading.umidade/100}
+          />
         </div>
         <div>
           <h3>Temperatura</h3>
           <GaugeChart id="gauge-temperature"
-          nrOfLevels={20} 
-          animate={false}
-          formatTextValue={value => `${value} °C`}
-          percent={lastReading.temperatura/100}
+            nrOfLevels={20} 
+            animate={false}
+            formatTextValue={value => `${value} °C`}
+            percent={lastReading.temperatura/100}
           />
         </div>
         <div>
           <h3>Luz</h3>
           <GaugeChart id="gauge-light"
-          nrOfLevels={30} 
-          animate={false}
-          colors={["#FF5F6D", "#FFC371"]} 
-          arcWidth={0.3} 
-          formatTextValue={value => `${value}`}
-          percent={lastReading.luz/100} 
-           />
-           {/* <GaugeChart id="gauge-chart4" 
-  nrOfLevels={10} 
-  arcPadding={0.1} 
-  cornerRadius={3} 
-  percent={0.6} 
-/>
-<GaugeChart id="gauge-chart5"
-  nrOfLevels={420}
-  arcsLength={[0.3, 0.5, 0.2]}
-  colors={['#5BE12C', '#F5CD19', '#EA4228']}
-  percent={0.37}
-  arcPadding={0.02}
-/>
-<GaugeChart id="gauge-chart6" 
-  animate={false} 
-  nrOfLevels={15} 
-  percent={0.56} 
-  needleColor="#345243" 
-/> */}
+            nrOfLevels={30} 
+            animate={false}
+            colors={["#FF5F6D", "#FFC371"]} 
+            arcWidth={0.3} 
+            formatTextValue={value => `${value}`}
+            percent={lastReading.luz/100} 
+          />
         </div>
-
-        
       </div>
 
       <h2>Leituras</h2>
