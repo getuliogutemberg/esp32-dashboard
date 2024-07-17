@@ -13,21 +13,20 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-
 const Dashboard = () => {
-    const [lastReading, setLastReading] = useState(null);
-    const allReadingsRef = useRef([]);
+  const lastReadingsRef = useRef(null);
+  const allReadingsRef = useRef([]);
   const [zoomStartIndex, setZoomStartIndex] = useState(0);
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
   const [userZoom, setUserZoom] = useState(false);
-
+  const maxLuzValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
+  const [lastDataDelay, setLastDataDelay] = useState(0);
+  const [isDataOnline, setIsDataOnline] = useState(false);
   const handleBrushChange = ({ startIndex, endIndex }) => {
     setUserZoom(true); // Indica que o usuário alterou manualmente o Brush
     setZoomStartIndex(startIndex);
-    // Verifica se o endIndex está na última leitura
     if (endIndex === allReadingsRef.current.length - 1) {
       setZoomEndIndex(allReadingsRef.current.length - 1);
-    //   setUserZoom(false);
     } else {
       setZoomEndIndex(endIndex);
     }
@@ -43,8 +42,9 @@ const Dashboard = () => {
     const fetchInitialData = async () => {
       try {
         const response = await axios.get("https://esp32-data-api-1.onrender.com/data");
-        console.log('Leituras:', response.data);
         allReadingsRef.current = response.data;
+        const maxLuz = Math.max(...response.data.map(entry => entry.luz));
+        maxLuzValue.current = maxLuz;
         if (response.data.length > 10) {
           setZoomStartIndex(response.data.length - 10);
           setZoomEndIndex(response.data.length - 1);
@@ -59,17 +59,37 @@ const Dashboard = () => {
 
   useEffect(() => {
     const fetchLastReading = async () => {
+
+      const checkDataDelay = (timestamp) => {
+        const timestampDate =new Date(timestamp);
+        const now = new Date();
+        
+        const lastDataDelay = now - timestampDate;
+        console.log(lastDataDelay);
+        setLastDataDelay(lastDataDelay);
+        
+        if (lastDataDelay > 20000) {
+          setIsDataOnline(false);
+        } else {
+          setIsDataOnline(true);
+        }
+        };
+      
       try {
         const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
-        console.log('Última leitura:', response.data);
-        setLastReading(response.data);
-        allReadingsRef.current = [...allReadingsRef.current, response.data];
-        console.log(allReadingsRef.current[allReadingsRef.current.length - 1]['luz']);
+        checkDataDelay(response.data.timestamp);
+        if (response.data.timestamp > allReadingsRef.current[allReadingsRef.current.length - 1].timestamp) {
+          lastReadingsRef.current = response.data;
+          allReadingsRef.current = [...allReadingsRef.current, response.data];
+        }
         
         if (allReadingsRef.current.length > 10 && !userZoom) {
           setZoomStartIndex(allReadingsRef.current.length - 10);
           setZoomEndIndex(allReadingsRef.current.length - 1);
         }
+        
+        const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
+        maxLuzValue.current = maxLuz;
       } catch (error) {
         console.error('Erro ao buscar última leitura:', error);
       }
@@ -80,16 +100,22 @@ const Dashboard = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [ userZoom ]);
+  }, [userZoom]);
 
-  if (!lastReading) {
+  if (allReadingsRef.current.length === 0) {
     return <div>Loading...</div>;
   }
 
   return (
     <div>
+        
       <h1>ESP32 Sensor Dashboard</h1>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center'}}>
+      <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px'}}>
+        
+          {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${(lastDataDelay / 1000).toFixed(0)} segundos.`}
+       
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',flexWrap: 'wrap'}}>
         <div>
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
@@ -98,8 +124,10 @@ const Dashboard = () => {
             animDelay={0}
             animateDuration={5000}
             formatTextValue={value => `${value} %H`}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1]['umidade'] / 100}
+            percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
+          <span style={{ fontSize: '12px' }}>umidade maxima: 100 %</span>
+
         </div>
         <div>
           <h3>Temperatura</h3>
@@ -109,30 +137,34 @@ const Dashboard = () => {
             animDelay={500}
             animateDuration={5000}
             formatTextValue={value => `${value} °C`}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1]['temperatura'] / 100}
+            percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
+          <span style={{ fontSize: '12px' }}>temperatura maxima: 100 °C</span>
+
         </div>
         <div>
           <h3>Luz</h3>
           <GaugeChart id="gauge-light"
             nrOfLevels={20} 
-            animate={false}
+            animate={true}
             animDelay={1000}
             animateDuration={5000}
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => ` (${allReadingsRef.current[allReadingsRef.current.length - 1]['luz']}) ${value} %`}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1]['luz'] / 250} 
+            formatTextValue={value => ` (${allReadingsRef.current[allReadingsRef.current.length - 1].luz}) ${value} %`}
+            percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
           />
+          <span style={{ fontSize: '12px' }}>Luz maxima: {maxLuzValue.current}</span>
         </div>
       </div>
 
-      <h2 style={{ margin: 0 }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px' , fontSize: '14px'}} onClick={handleZoomButtonClick}>
+      <h2 style={{ margin: '20px 0' , fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px' , fontSize: '14px'}} onClick={handleZoomButtonClick}>
         Tempo real
       </button>}</h2>
+
       
       
       <ResponsiveContainer width="100%" height={400}>
@@ -141,7 +173,7 @@ const Dashboard = () => {
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }}  />
           <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
           <Tooltip contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
-          <Legend contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
+          <Legend contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} wrapperStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
           <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} />
           <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false}/>
           <Line type="monotone" dataKey="luz" stroke="#ffc658" dot={false}/>
