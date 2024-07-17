@@ -9,6 +9,7 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
+  Brush,
   Legend,
   ResponsiveContainer,
 } from 'recharts';
@@ -16,6 +17,13 @@ import {
 const Dashboard = () => {
   const [lastReading, setLastReading] = useState(null);
   const [allReadings, setAllReadings] = useState([]);
+  const [zoomStartIndex, setZoomStartIndex] = useState(0);
+
+  useEffect(() => {
+    if (allReadings.length > 10) {
+      setZoomStartIndex(allReadings.length - 10);
+    }
+  }, [allReadings]);
 
   useEffect(() => {
     const fetchLastReading = async () => {
@@ -55,6 +63,8 @@ const Dashboard = () => {
     return <div>Loading...</div>;
   }
 
+  
+
   return (
     <div>
       <h1>ESP32 Sensor Dashboard</h1>
@@ -92,15 +102,22 @@ const Dashboard = () => {
 
       <h2>Leituras</h2>
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={allReadings}>
+        <LineChart data={allReadings} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" />
-          <YAxis />
-          <Tooltip />
-          <Legend />
-          <Line type="monotone" dataKey="umidade" stroke="#8884d8" />
-          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" />
-          <Line type="monotone" dataKey="luz" stroke="#ffc658" />
+          <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }}  />
+          <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
+          <Tooltip contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
+          <Legend contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
+          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} />
+          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false}/>
+          <Line type="monotone" dataKey="luz" stroke="#ffc658" dot={false}/>
+          <Brush
+          startIndex={zoomStartIndex}
+          endIndex={allReadings.length - 1}
+          stroke="#8884d8"
+          dataKey="timestamp"
+          tickFormatter={value => new Date(value).toLocaleTimeString()}
+        />
         </LineChart>
       </ResponsiveContainer>
     </div>
