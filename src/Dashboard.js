@@ -118,24 +118,23 @@ const Dashboard = () => {
     }
   };
 
-
   if (allReadingsRef.current.length === 0) {
-    return <div>Carregando dados...</div>;
+    return <div style={{marginRight: '30px'}}>Consultando dados... </div>;
   }
 
 
   return (
     <div>
         
-      <h1>ESP32 Sensor Dashboard</h1>
-      <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px'}}>
+      <h1 style={{marginTop: '30px'}}>ESP32 Sensor Dashboard</h1>
+      <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px'}}>
         
           {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${(lastDataDelay / 1000).toFixed(0)} segundos.`}
        
       </div>
       <div 
       onClick={handleDeleteData}
-      style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '40px', cursor: 'pointer'}}
+      style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer'}}
       >
         
           {`Apagar dados`}
