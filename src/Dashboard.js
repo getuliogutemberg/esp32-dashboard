@@ -138,7 +138,7 @@ const Dashboard = () => {
 
 
   return (
-    <div>
+    <div style={{ display: 'flex' , flexDirection: 'column', justifyContent: 'center', alignItems: 'center',flexWrap: 'wrap',margin:'0 auto'}}>
         
      
       <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px'}}>
