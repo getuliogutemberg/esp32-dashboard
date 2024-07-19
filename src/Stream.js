@@ -33,7 +33,7 @@ function Stream() {
   // };
 
   return (
-      <div style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap'  }} >
+      <div style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', margin: '0 auto'  }} >
       
       {/* <iframe
        
@@ -50,9 +50,9 @@ function Stream() {
       ></iframe> */}
 
 <iframe width="450" height="255" src="https://www.youtube.com/embed/mFR_uCIqJRg?controls=0&autoplay=1&mute=1&loop=1&modestbranding=1&rel=0" title="esp32" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{ pointerEvents:'none',margin:'20px',borderRadius:'10px'}}></iframe>
-      <div >
+      {/* <div >
 
-      {/* <label htmlFor="iframeSrc" style={{ fontSize: '25px'}} title='https://rb.gy/ '>Stream: </label>
+      <label htmlFor="iframeSrc" style={{ fontSize: '25px'}} title='https://rb.gy/ '>Stream: </label>
        <input
         id="iframeSrc"
         type="text"
@@ -60,8 +60,8 @@ function Stream() {
         value={iframeSrc || ''}
         onChange={handleInputChange}
         style={{ margin: '20px' , padding: '10px', fontSize: '25px', borderRadius: '5px', border: '1px solid #ccc',textAlign: 'center' }}
-        /> */}
-        </div>
+        />
+        </div> */}
     </div>
   );
 }

@@ -143,7 +143,7 @@ const Dashboard = () => {
      
       <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px'}}>
         
-          {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${convertMilliseconds(lastDataDelay)}.`}
+          {isDataOnline ? 'Online ' : 'Offline '}  {`a ${convertMilliseconds(lastDataDelay)}.`}
        
       </div>
       <div 
