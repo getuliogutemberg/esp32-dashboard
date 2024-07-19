@@ -3,7 +3,7 @@ import GaugeChart from 'react-gauge-chart';
 import axios from 'axios';
 // import io from 'socket.io-client';
 import {
-  LineChart,
+  ComposedChart,
   Line,
   XAxis,
   YAxis,
@@ -12,6 +12,8 @@ import {
   Brush,
   Legend,
   ResponsiveContainer,
+  Bar,
+  Area,
 } from 'recharts';
 
 const Dashboard = () => {
@@ -208,15 +210,19 @@ const Dashboard = () => {
       <h2 style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
 
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+        <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }} />
-          <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
+          <YAxis stroke="#ccc" style={{ fontSize: '14px' }} domain={[0, 100]} />
           <Tooltip contentStyle={{ fontSize: '20px', background: '#000' }} labelFormatter={(value) => new Date(value).toLocaleTimeString()} offset={100} />
           <Legend />
-          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} name='Umidade' unit=" %H" />
-          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
-          <Line type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
+          {/* <Bar  type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} /> */}
+          {/* <Line strokeWidth={5} type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} name='Umidade' unit=" %H"  /> */}
+          {/* <Line strokeWidth={5} type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
+          <Bar type="monotone" dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
+          {/* <Area type="monotone" dataKey="temperatura" stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
+          <Bar type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
+          <Line strokeWidth={5} type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}
@@ -225,7 +231,7 @@ const Dashboard = () => {
             tickFormatter={value => new Date(value).toLocaleTimeString()}
             onChange={handleBrushChange}
           />
-        </LineChart>
+        </ComposedChart>
       </ResponsiveContainer>
     </div>
   );
