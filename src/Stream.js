@@ -49,7 +49,7 @@ function Stream() {
         style={{ marginTop: '10px', border: '0px solid #ccc', borderRadius: '10px',display: iframeSrc ? 'block' : 'none',marginBottom: '20px' }}
       ></iframe> */}
 
-<iframe width="350" height="250"  src="https://www.youtube.com/embed/mFR_uCIqJRg?controls=0&autoplay=1&mute=1&loop=1&modestbranding=1&rel=0" title="esp32" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen style={{ pointerEvents:'none',margin:'20px',borderRadius:'10px'}}></iframe>
+<iframe width="350" height="250"  src="https://www.youtube.com/embed/mFR_uCIqJRg?controls=0&autoplay=1&mute=1&loop=1&modestbranding=1&rel=0" title="esp32" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin" allowFullScreen style={{ pointerEvents:'none',margin:'20px',borderRadius:'10px'}}></iframe>
       {/* <div >
 
       <label htmlFor="iframeSrc" style={{ fontSize: '25px'}} title='https://rb.gy/ '>Stream: </label>

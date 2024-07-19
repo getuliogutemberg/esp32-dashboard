@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import axios from 'axios';
-import io from 'socket.io-client';
+// import io from 'socket.io-client';
 import {
   LineChart,
   Line,
@@ -23,7 +23,7 @@ const Dashboard = () => {
   const maxLuzValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
   const [lastDataDelay, setLastDataDelay] = useState(0);
   const [isDataOnline, setIsDataOnline] = useState(false);
-  const socketRef = useRef(null);
+  // const socketRef = useRef(null);
 
   const handleBrushChange = ({ startIndex, endIndex }) => {
     setUserZoom(true); // Indica que o usuário alterou manualmente o Brush
@@ -63,32 +63,60 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const checkDataDelay = (timestamp) => {
-      const timestampDate = new Date(timestamp);
-      const now = new Date();
-      const lastDataDelay = now - timestampDate;
-      setLastDataDelay(lastDataDelay);
-      setIsDataOnline(lastDataDelay <= 20000);
-    };
+    const fetchLastReading = async () => {
+      const checkDataDelay = (timestamp) => {
+        const timestampDate = new Date(timestamp);
+        const now = new Date();
+        const lastDataDelay = now - timestampDate;
+        setLastDataDelay(lastDataDelay);
+        setIsDataOnline(lastDataDelay <= 20000);
+      };
 
-    socketRef.current = io("https://esp32-data-api-1.onrender.com");
-
-    socketRef.current.on('newData', (newData) => {
-      checkDataDelay(newData.timestamp);
-      allReadingsRef.current = [...allReadingsRef.current, newData];
-      if (!userZoom) {
-        setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
-        setZoomEndIndex(allReadingsRef.current.length - 1);
+      try {
+        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+        checkDataDelay(response.data.timestamp);
+        if (response.data.timestamp > allReadingsRef.current[allReadingsRef.current.length - 1].timestamp) {
+          lastReadingsRef.current = response.data;
+          allReadingsRef.current = [...allReadingsRef.current, response.data];
+        }
+        
+        if (allReadingsRef.current.length && !userZoom) {
+          setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
+          setZoomEndIndex(allReadingsRef.current.length - 1);
+        } 
+        
+        const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
+        maxLuzValue.current = maxLuz;
+      } catch (error) {
+        console.error('Erro ao buscar última leitura:', error);
       }
-
-      const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
-      maxLuzValue.current = maxLuz;
-    });
-
-    return () => {
-      socketRef.current.disconnect();
     };
+
+    const interval = setInterval(() => {
+      fetchLastReading();
+    }, 5000);
+
+    return () => clearInterval(interval);
   }, [userZoom]);
+
+  // useEffect(() => {
+  //   socketRef.current = io("https://esp32-data-api-1.onrender.com:3000");
+
+  //   socketRef.current.on('newData', (newData) => {
+  //     allReadingsRef.current = [...allReadingsRef.current, newData];
+  //     if (!userZoom) {
+  //       setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
+  //       setZoomEndIndex(allReadingsRef.current.length - 1);
+  //     }
+
+  //     const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
+  //     maxLuzValue.current = maxLuz;
+  //   });
+
+  //   return () => {
+  //     socketRef.current.disconnect();
+  //   };
+  // }, [userZoom]);
 
   const handleDeleteData = async () => {
     const confirmDelete = window.confirm("Os dados serão apagados permanentemente. Deseja continuar?");
@@ -144,7 +172,7 @@ const Dashboard = () => {
             formatTextValue={value => `${value} %H`}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
-          <span style={{ fontSize: '12px' }}>umidade maxima: 100 %</span>
+          <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
         </div>
         <div>
           <h3>Temperatura</h3>
@@ -156,10 +184,10 @@ const Dashboard = () => {
             formatTextValue={value => `${value} °C`}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
-          <span style={{ fontSize: '12px' }}>temperatura maxima: 100 °C</span>
+          <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
         </div>
         <div>
-          <h3>Luz</h3>
+          <h3>Luminosidade</h3>
           <GaugeChart id="gauge-light"
             nrOfLevels={20} 
             animate={false}
@@ -173,7 +201,7 @@ const Dashboard = () => {
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
           />
-          <span style={{ fontSize: '12px' }}>Luz maxima: {maxLuzValue.current}</span>
+          <span style={{ fontSize: '12px' }}>Luminosidade maxima: {maxLuzValue.current}</span>
         </div>
       </div>
 
@@ -186,9 +214,9 @@ const Dashboard = () => {
           <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
           <Tooltip contentStyle={{ fontSize: '20px', background: '#000' }} labelFormatter={(value) => new Date(value).toLocaleTimeString()} offset={100} />
           <Legend />
-          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} unit=" %H" />
-          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} unit=" °C" />
-          <Line type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="luz" unit=" %" stroke="#ffc658" dot={false} />
+          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} name='Umidade' unit=" %H" />
+          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
+          <Line type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}
