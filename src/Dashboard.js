@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import axios from 'axios';
+import io from 'socket.io-client';
 import {
   LineChart,
   Line,
@@ -22,6 +23,8 @@ const Dashboard = () => {
   const maxLuzValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
   const [lastDataDelay, setLastDataDelay] = useState(0);
   const [isDataOnline, setIsDataOnline] = useState(false);
+  const socketRef = useRef(null);
+
   const handleBrushChange = ({ startIndex, endIndex }) => {
     setUserZoom(true); // Indica que o usuário alterou manualmente o Brush
     setZoomStartIndex(startIndex);
@@ -60,48 +63,31 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    const fetchLastReading = async () => {
-
-      const checkDataDelay = (timestamp) => {
-        const timestampDate =new Date(timestamp);
-        const now = new Date();
-        
-        const lastDataDelay = now - timestampDate;
-        // console.log(lastDataDelay);
-        setLastDataDelay(lastDataDelay);
-        
-        if (lastDataDelay > 20000) {
-          setIsDataOnline(false);
-        } else {
-          setIsDataOnline(true);
-        }
-        };
-      
-      try {
-        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
-        checkDataDelay(response.data.timestamp);
-        if (response.data.timestamp > allReadingsRef.current[allReadingsRef.current.length - 1].timestamp) {
-          lastReadingsRef.current = response.data;
-          allReadingsRef.current = [...allReadingsRef.current, response.data];
-        }
-        
-        if (allReadingsRef.current.length && !userZoom) {
-          setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
-          setZoomEndIndex(allReadingsRef.current.length - 1);
-        } 
-        
-        const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
-        maxLuzValue.current = maxLuz;
-      } catch (error) {
-        console.error('Erro ao buscar última leitura:', error);
-      }
+    const checkDataDelay = (timestamp) => {
+      const timestampDate = new Date(timestamp);
+      const now = new Date();
+      const lastDataDelay = now - timestampDate;
+      setLastDataDelay(lastDataDelay);
+      setIsDataOnline(lastDataDelay <= 20000);
     };
 
-    const interval = setInterval(() => {
-      fetchLastReading();
-    }, 5000);
+    socketRef.current = io("https://esp32-data-api-1.onrender.com");
 
-    return () => clearInterval(interval);
+    socketRef.current.on('newData', (newData) => {
+      checkDataDelay(newData.timestamp);
+      allReadingsRef.current = [...allReadingsRef.current, newData];
+      if (!userZoom) {
+        setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
+        setZoomEndIndex(allReadingsRef.current.length - 1);
+      }
+
+      const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
+      maxLuzValue.current = maxLuz;
+    });
+
+    return () => {
+      socketRef.current.disconnect();
+    };
   }, [userZoom]);
 
   const handleDeleteData = async () => {
@@ -136,25 +122,18 @@ const Dashboard = () => {
     return `${hours} horas, ${minutes} minutos e ${seconds} segundos`;
   };
 
-
   return (
-    <div style={{ display: 'flex' , flexDirection: 'column', justifyContent: 'center', alignItems: 'center',flexWrap: 'wrap',margin:'0 auto'}}>
-        
-     
-      <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px'}}>
-        
-          {isDataOnline ? 'Online.' : `Offline a ${convertMilliseconds(lastDataDelay)}.`}
-       
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', margin: '0 auto' }}>
+      <div style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px' }}>
+        {isDataOnline ? 'Online.' : `Offline a ${convertMilliseconds(lastDataDelay)}.`}
       </div>
       <div 
-      onClick={handleDeleteData}
-      style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer'}}
+        onClick={handleDeleteData}
+        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer' }}
       >
-        
-          {`Apagar dados`}
-       
+        Apagar dados
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',flexWrap: 'wrap'}}>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
         <div>
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
@@ -166,7 +145,6 @@ const Dashboard = () => {
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
           <span style={{ fontSize: '12px' }}>umidade maxima: 100 %</span>
-
         </div>
         <div>
           <h3>Temperatura</h3>
@@ -179,13 +157,12 @@ const Dashboard = () => {
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
           <span style={{ fontSize: '12px' }}>temperatura maxima: 100 °C</span>
-
         </div>
         <div>
           <h3>Luz</h3>
           <GaugeChart id="gauge-light"
             nrOfLevels={20} 
-            animate={true}
+            animate={false}
             animDelay={1000}
             animateDuration={5000}
             colors={["#FF5F6D", "#FFC371"]} 
@@ -200,22 +177,18 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <h2 style={{ margin: '20px 0' , fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px' , fontSize: '14px'}} onClick={handleZoomButtonClick}>
-        Tempo real
-      </button>}</h2>
+      <h2 style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
 
-      
-      
       <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+        <LineChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }}  />
+          <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }} />
           <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
-          <Tooltip contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
-          <Legend contentStyle={{ fontSize: '20px', fontWeight: 'bold' }} wrapperStyle={{ fontSize: '20px', fontWeight: 'bold' }} />
-          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} />
-          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false}/>
-          <Line type="monotone" dataKey="luz" stroke="#ffc658" dot={false}/>
+          <Tooltip contentStyle={{ fontSize: '20px', background: '#000' }} labelFormatter={(value) => new Date(value).toLocaleTimeString()} offset={100} />
+          <Legend />
+          <Line type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} unit=" %H" />
+          <Line type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} unit=" °C" />
+          <Line type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="luz" unit=" %" stroke="#ffc658" dot={false} />
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}
