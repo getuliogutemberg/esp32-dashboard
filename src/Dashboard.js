@@ -105,16 +105,22 @@ const Dashboard = () => {
   }, [userZoom]);
 
   const handleDeleteData = async () => {
-    try {
-      const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
-      allReadingsRef.current = [response.data]; 
-      lastReadingsRef.current = null;
-      setZoomStartIndex(0);
-      setZoomEndIndex(0);
-      await axios.delete("https://esp32-data-api-1.onrender.com/data");
-      
-    } catch (error) {
-      console.error('Erro ao apagar dados:', error);
+    const confirmDelete = window.confirm("Os dados serão apagados permanentemente. Deseja continuar?");
+  
+    if (confirmDelete) {
+      try {
+        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+        allReadingsRef.current = [response.data];
+        lastReadingsRef.current = null;
+        setZoomStartIndex(0);
+        setZoomEndIndex(0);
+        await axios.delete("https://esp32-data-api-1.onrender.com/data");
+        alert('Dados apagados com sucesso.');
+      } catch (error) {
+        console.error('Erro ao apagar dados:', error);
+      }
+    } else {
+      alert('Ação de exclusão cancelada.');
     }
   };
 
@@ -122,14 +128,22 @@ const Dashboard = () => {
     return <div style={{marginRight: '30px'}}>Consultando dados... </div>;
   }
 
+  const convertMilliseconds = (ms) => {
+    let seconds = Math.floor((ms / 1000) % 60);
+    let minutes = Math.floor((ms / (1000 * 60)) % 60);
+    let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
+  
+    return `${hours} horas, ${minutes} minutos e ${seconds} segundos`;
+  };
+
 
   return (
     <div>
         
-      <h1 style={{marginTop: '30px'}}>ESP32 Sensor Dashboard</h1>
+     
       <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px'}}>
         
-          {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${(lastDataDelay / 1000).toFixed(0)} segundos.`}
+          {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${convertMilliseconds(lastDataDelay)}.`}
        
       </div>
       <div 
@@ -193,7 +207,7 @@ const Dashboard = () => {
       
       
       <ResponsiveContainer width="100%" height={400}>
-      <LineChart data={allReadingsRef.current} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <LineChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }}  />
           <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
