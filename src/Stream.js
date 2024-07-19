@@ -1,10 +1,29 @@
 // src/Stream.js
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 
 function Stream() {
   
-  const [iframeSrc, setIframeSrc] = useState('wmlgqm');
+  const [iframeSrc, setIframeSrc] = useState('');
+  
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      try {
+        const response = await axios.get("https://esp32-data-api-1.onrender.com/token");
+        
+        if (response.data) {
+         
+          setIframeSrc( response.data );
+        }
+      } catch (error) {
+        console.error('Erro ao buscar o token:', error);
+      }
+    };
+
+    fetchToken();
+  }, []);
 
  
 
@@ -19,26 +38,26 @@ function Stream() {
       <iframe
        
         
-        width="700"
+        width="450"
         height="395"
         src={'https://rb.gy/' + iframeSrc}
         title="esp32"
         frameBorder="0"
         // allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
         // referrerPolicy="strict-origin-when-cross-origin"
-        // allowFullScreen
-        style={{ marginTop: '10px', border: '0px solid #ccc', borderRadius: '10px' }}
+        allowFullScreen
+        style={{ marginTop: '10px', border: '0px solid #ccc', borderRadius: '10px',display: iframeSrc ? 'block' : 'none' }}
       ></iframe>
       <div >
 
-      <label htmlFor="iframeSrc" style={{ fontSize: '25px'}} title='https://rb.gy/ '>Enter Code: </label>
+      <label htmlFor="iframeSrc" style={{ fontSize: '25px'}} title='https://rb.gy/ '>Stream: </label>
        <input
         id="iframeSrc"
         type="text"
-        placeholder="Enter iframe URL"
+        placeholder="token"
         value={iframeSrc}
         onChange={handleInputChange}
-        style={{ marginTop: '20px' , padding: '10px', fontSize: '25px', borderRadius: '5px', border: '1px solid #ccc',textAlign: 'center' }}
+        style={{ margin: '20px' , padding: '10px', fontSize: '25px', borderRadius: '5px', border: '1px solid #ccc',textAlign: 'center' }}
         />
         </div>
     </div>

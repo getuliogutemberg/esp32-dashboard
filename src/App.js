@@ -9,7 +9,7 @@ function App() {
 
   return (
     <div className="App">
-      <header className="App-header" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
+      <header className="App-header" style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap',paddingTop:'20px' }}>
         <Dashboard />
         <Stream />
       </header>
