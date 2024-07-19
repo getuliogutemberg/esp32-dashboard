@@ -13,7 +13,7 @@ import {
   Legend,
   ResponsiveContainer,
   Bar,
-  Area,
+  // Area,
 } from 'recharts';
 
 const Dashboard = () => {
