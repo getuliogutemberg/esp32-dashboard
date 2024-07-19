@@ -5,15 +5,15 @@ import axios from 'axios';
 
 function Stream() {
   
-  const [iframeSrc, setIframeSrc] = useState('');
+  const [iframeSrc, setIframeSrc] = useState(null);
   
 
   useEffect(() => {
     const fetchToken = async () => {
       try {
         const response = await axios.get("https://esp32-data-api-1.onrender.com/token");
-        
-        if (response.data) {
+        console.log(response)
+        if (response) {
          
           setIframeSrc( response.data );
         }
@@ -55,7 +55,7 @@ function Stream() {
         id="iframeSrc"
         type="text"
         placeholder="token"
-        value={iframeSrc}
+        value={iframeSrc || ''}
         onChange={handleInputChange}
         style={{ margin: '20px' , padding: '10px', fontSize: '25px', borderRadius: '5px', border: '1px solid #ccc',textAlign: 'center' }}
         />

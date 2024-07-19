@@ -16,7 +16,7 @@ import {
 const Dashboard = () => {
   const lastReadingsRef = useRef(null);
   const allReadingsRef = useRef([]);
-  const [zoomStartIndex, setZoomStartIndex] = useState(0);
+  const [zoomStartIndex, setZoomStartIndex] = useState(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
   const [userZoom, setUserZoom] = useState(false);
   const maxLuzValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
@@ -33,7 +33,7 @@ const Dashboard = () => {
   };
 
   const handleZoomButtonClick = () => {
-    setZoomStartIndex(allReadingsRef.current.length - 10);
+    setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0); // Se houver mais de 10 leituras, zoom inicia em 10 leituras atras
     setZoomEndIndex(allReadingsRef.current.length - 1);
     setUserZoom(false); // Indica que o usuário alterou manualmente o Zoom
   };
@@ -48,13 +48,15 @@ const Dashboard = () => {
         if (response.data.length > 10) {
           setZoomStartIndex(response.data.length - 10);
           setZoomEndIndex(response.data.length - 1);
-        }
+        } 
       } catch (error) {
         console.error('Erro ao buscar todas as leituras:', error);
       }
     };
-
+    
     fetchInitialData();
+    
+    
   }, []);
 
   useEffect(() => {
@@ -65,7 +67,7 @@ const Dashboard = () => {
         const now = new Date();
         
         const lastDataDelay = now - timestampDate;
-        console.log(lastDataDelay);
+        // console.log(lastDataDelay);
         setLastDataDelay(lastDataDelay);
         
         if (lastDataDelay > 20000) {
@@ -83,10 +85,10 @@ const Dashboard = () => {
           allReadingsRef.current = [...allReadingsRef.current, response.data];
         }
         
-        if (allReadingsRef.current.length > 10 && !userZoom) {
-          setZoomStartIndex(allReadingsRef.current.length - 10);
+        if (allReadingsRef.current.length && !userZoom) {
+          setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
           setZoomEndIndex(allReadingsRef.current.length - 1);
-        }
+        } 
         
         const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
         maxLuzValue.current = maxLuz;
@@ -102,9 +104,25 @@ const Dashboard = () => {
     return () => clearInterval(interval);
   }, [userZoom]);
 
+  const handleDeleteData = async () => {
+    try {
+      const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+      allReadingsRef.current = [response.data]; 
+      lastReadingsRef.current = null;
+      setZoomStartIndex(0);
+      setZoomEndIndex(0);
+      await axios.delete("https://esp32-data-api-1.onrender.com/data");
+      
+    } catch (error) {
+      console.error('Erro ao apagar dados:', error);
+    }
+  };
+
+
   if (allReadingsRef.current.length === 0) {
-    return <div>Loading...</div>;
+    return <div>Carregando dados...</div>;
   }
+
 
   return (
     <div>
@@ -113,6 +131,14 @@ const Dashboard = () => {
       <div style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px'}}>
         
           {isDataOnline ? 'Online. ' : 'Offline. '}  {` Última atualização há ${(lastDataDelay / 1000).toFixed(0)} segundos.`}
+       
+      </div>
+      <div 
+      onClick={handleDeleteData}
+      style={{color: 'white', fontSize: '14px' ,position: 'fixed',backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '40px', cursor: 'pointer'}}
+      >
+        
+          {`Apagar dados`}
        
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center',flexWrap: 'wrap'}}>
@@ -168,7 +194,7 @@ const Dashboard = () => {
       
       
       <ResponsiveContainer width="100%" height={400}>
-        <LineChart data={allReadingsRef.current} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+      <LineChart data={allReadingsRef.current} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }}  />
           <YAxis stroke="#ccc" style={{ fontSize: '14px' }} />
