@@ -18,7 +18,12 @@ import {
 
 const Dashboard = () => {
   const lastReadingsRef = useRef(null);
-  const allReadingsRef = useRef([]);
+  const allReadingsRef = useRef([{
+    timestamp: 0,
+    luz: 0,
+    temperatura: 0,
+    umidade: 0,
+  }]);
   const [zoomStartIndex, setZoomStartIndex] = useState(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
   const [userZoom, setUserZoom] = useState(false);
