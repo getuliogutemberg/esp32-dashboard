@@ -19,7 +19,7 @@ import {
 const Dashboard = () => {
   const lastReadingsRef = useRef(null);
   const allReadingsRef = useRef([{
-    timestamp: 0,
+    timestamp: new Date().getTime(),
     luz: 0,
     temperatura: 0,
     umidade: 0,
