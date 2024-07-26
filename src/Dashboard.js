@@ -254,10 +254,10 @@ const Dashboard = () => {
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* deve ficar piscando */}
           
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' }}>{allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura} °C` : "Offline"}</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura} °C` : "Offline"}</span>
           
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
-          <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima: {maxTemperaturaValue.current} °C</span>
+          <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",transition: 'color 0.5s ease-in-out',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima: {maxTemperaturaValue.current} °C</span>
           <span style={{ fontSize: '12px',color: "rgba(0, 0, 255, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima: {minTemperaturaValue.current} °C</span>
           </div>
         </div>
