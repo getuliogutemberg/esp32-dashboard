@@ -53,8 +53,13 @@ const Dashboard = () => {
       try {
         const response = await axios.get("https://esp32-data-api-1.onrender.com/data");
         allReadingsRef.current = response.data;
+
+        // define maxLuz
         const maxLuz = Math.max(...response.data.map(entry => entry.luz));
+
         maxLuzValue.current = maxLuz;
+
+        // Define zoomStartIndex e zoomEndIndex
         if (response.data.length > 10) {
           setZoomStartIndex(response.data.length - 10);
           setZoomEndIndex(response.data.length - 1);
@@ -91,7 +96,7 @@ const Dashboard = () => {
           setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
           setZoomEndIndex(allReadingsRef.current.length - 1);
         } 
-        
+        // define maxLuz 
         const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
         maxLuzValue.current = maxLuz;
       } catch (error) {
@@ -176,7 +181,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${value} %H`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? "busy" : value} %H`}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
           <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
@@ -188,7 +193,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={500}
             animateDuration={5000}
-            formatTextValue={value => `${value} °C`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? "busy" : value} °C`}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
@@ -203,7 +208,7 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => ` (${allReadingsRef.current[allReadingsRef.current.length - 1].luz}) ${value} %`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? "busy" : value}`}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
