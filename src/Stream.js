@@ -1,8 +1,6 @@
 // src/Stream.js
 import React from 'react';
-// import axios from 'axios';
 
-import Slider from 'react-slick';
 
 
 const features = [
@@ -28,13 +26,7 @@ const features = [
   }
 ];
 
-const  settings = {
-  dots: true,
-  infinite: true,
-  speed: 500,
-  slidesToShow: 1,
-  slidesToScroll: 1,
-};
+
 
 
 function Stream() {
