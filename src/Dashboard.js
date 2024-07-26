@@ -270,7 +270,7 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value * 100 / maxLuzValue.current).toFixed(0) + 'L' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L (' + (value * 100 / maxLuzValue.current).toFixed(0) + ' %)' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
@@ -300,7 +300,7 @@ const Dashboard = () => {
           <Bar type="monotone" dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
           {/* <Area type="monotone" dataKey="temperatura" stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
           <Bar type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
-          <Line strokeWidth={5} type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
+          <Line strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz * 100 / maxLuzValue.current).toFixed(0)} formatTextValue={value => `${value} L`} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}
