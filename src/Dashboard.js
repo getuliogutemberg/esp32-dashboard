@@ -229,7 +229,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + ' %' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + ' %' : "Indisponível"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -248,7 +248,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={500}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + ' °C' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + ' °C' : "Indisponível"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -271,7 +271,7 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*maxLuzValue.current).toFixed(2) + ' L (' + value + ' %)' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*maxLuzValue.current).toFixed(2) + ' L (' + value + ' %)' : "Indisponível"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
