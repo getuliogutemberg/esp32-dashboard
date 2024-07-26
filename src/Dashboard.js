@@ -20,9 +20,9 @@ const Dashboard = () => {
   const lastReadingsRef = useRef(null);
   const allReadingsRef = useRef([{
     timestamp: new Date().getTime(),
-    luz: 0,
-    temperatura: 0,
-    umidade: 0,
+    luz: NaN,
+    temperatura: NaN, 
+    umidade: NaN ,
   }]);
   const [zoomStartIndex, setZoomStartIndex] = useState(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
@@ -229,13 +229,13 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + ' %' : "Indisponível"} `}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
+            formatTextValue={value => `${value === 0 ? "0 %" : allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? (value*maxUmidadeValue.current/100).toFixed(2) + ' %' : "Indisponível"} `}
+            percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / maxUmidadeValue.current}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* deve ficar piscando */}
 
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade} %` : "Offline"}</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].umidade === 0 ? "0 %" : allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade} %` : "Offline"}</span>
           <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
           <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Maxima: {maxUmidadeValue.current} %</span>
           <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minUmidadeValue.current} %</span>
@@ -248,13 +248,13 @@ const Dashboard = () => {
             animate={false}
             animDelay={500}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + ' °C' : "Indisponível"} `}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
+            formatTextValue={value => `${value === 0 ? "0 °C" : allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? (value*maxTemperaturaValue.current/100).toFixed(2) + ' °C' : "Indisponível"} `}
+            percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / maxTemperaturaValue.current}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* deve ficar piscando */}
           
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura} °C` : "Offline"}</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].temperatura === 0 ? "0 °C" : allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura} °C` : "Offline"}</span>
           
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
           <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",transition: 'color 0.5s ease-in-out',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima: {maxTemperaturaValue.current} °C</span>
@@ -271,15 +271,15 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*maxLuzValue.current/100).toFixed(2) + ' L (' + value + ' %)' : "Indisponível"} `}
+            formatTextValue={value => `${value === 0 ? "0 L (0 %)" : allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*maxLuzValue.current/100).toFixed(2) + ' L (' + value + ' %)' : "Indisponível"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
           />
           {/* deve ficar piscando */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].luz ? `${allReadingsRef.current[allReadingsRef.current.length - 1].luz} L` : "Offline"}</span>
-          <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4068 L</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].luz === 0 ? "0 L" : allReadingsRef.current[allReadingsRef.current.length - 1].luz ? `${allReadingsRef.current[allReadingsRef.current.length - 1].luz} L` : "Offline"}</span>
+          <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4095 L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Maxima: {maxLuzValue.current} L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Minima: {minLuzValue.current} L</span>
           </div>
@@ -292,16 +292,21 @@ const Dashboard = () => {
         <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }} />
-          <YAxis stroke="#ccc" style={{ fontSize: '14px' }} domain={[0, 100]} />
+          <YAxis stroke="#8884d8" yAxisId="left1" orientation="left" style={{ fontSize: '14px' }} domain={[minUmidadeValue.current, maxUmidadeValue.current]} unit={' %'} />
+          <YAxis stroke="#82ca9d" yAxisId="left2" orientation="left" style={{ fontSize: '14px' }} domain={[minTemperaturaValue.current, maxTemperaturaValue.current]} unit={' °C'} />
+          <YAxis stroke="#ffc658"  yAxisId="right1" orientation="right" style={{ fontSize: '14px' }} domain={[minLuzValue.current, maxLuzValue.current]} unit={' L'} />
+          <YAxis stroke="#ffc658"  yAxisId="right2" orientation="right" style={{ fontSize: '14px' }} domain={(value )=> [minLuzValue.current/maxLuzValue.current*100,maxLuzValue.current/maxLuzValue.current*100]} unit={' %'} />
+
+
           <Tooltip contentStyle={{ fontSize: '20px', background: '#000' }} labelFormatter={(value) => new Date(value).toLocaleTimeString()} offset={100} />
           <Legend />
           {/* <Bar  type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} /> */}
           {/* <Line strokeWidth={5} type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} name='Umidade' unit=" %H"  /> */}
           {/* <Line strokeWidth={5} type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
-          <Bar type="monotone" dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
+          <Bar yAxisId="left1" type="monotone"  dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
           {/* <Area type="monotone" dataKey="temperatura" stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
-          <Bar type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
-          <Line strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz * 100 / maxLuzValue.current).toFixed(0)} formatTextValue={value => `${value} L`} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
+          <Bar yAxisId="left2" type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
+          <Line yAxisId="right1" strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz).toFixed(2)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" L" stroke="#ffc658" dot={false} />
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}

@@ -10,8 +10,8 @@ function App() {
   return (
     <div className="App">
       <header className="App-header" style={{ display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'start-between', alignItems: 'center'}}>
-      <h1 style={{}}>ESP32 Sensor Dashboard</h1>
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'start'}}>
+      <h1 style={{ margin: '0px', padding: '0px'}}>ESP32 Sensor Dashboard</h1>
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'start'}}>
 
         <Stream />
         <Dashboard />
