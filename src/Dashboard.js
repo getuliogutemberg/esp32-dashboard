@@ -270,7 +270,7 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L (' + (value * 100 / maxLuzValue.current).toFixed(0) + ' %)' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*4068).toFixed(2) + 'L (' + value + ' %)' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
