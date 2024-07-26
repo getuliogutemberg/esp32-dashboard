@@ -221,8 +221,8 @@ const Dashboard = () => {
       >
         Apagar dados
       </div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
             nrOfLevels={1}
@@ -234,14 +234,14 @@ const Dashboard = () => {
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* deve ficar piscando */}
-          <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%' : "Offline"} `}</span>
-         
+
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade} %` : "Offline"}</span>
           <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
-          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Maxima: {maxLuzValue.current} %</span>
-          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minLuzValue.current} %</span>
+          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Maxima: {maxUmidadeValue.current} %</span>
+          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minUmidadeValue.current} %</span>
           </div>
         </div>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3>Temperatura</h3>
           <GaugeChart id="gauge-temperature"
             nrOfLevels={10} 
@@ -261,8 +261,8 @@ const Dashboard = () => {
           <span style={{ fontSize: '12px',color: "rgba(0, 0, 255, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima: {minTemperaturaValue.current} °C</span>
           </div>
         </div>
-        <div>
-          <h3>Luminosidade</h3>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+          <h3 >Luminosidade</h3>
           <GaugeChart id="gauge-light"
             nrOfLevels={20} 
             animate={false}
@@ -278,7 +278,7 @@ const Dashboard = () => {
           />
           {/* deve ficar piscando */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)',display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "Offline"} `}</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].luz ? `${allReadingsRef.current[allReadingsRef.current.length - 1].luz} L` : "Offline"}</span>
           <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4068 L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Maxima: {maxLuzValue.current} L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Minima: {minLuzValue.current} L</span>
