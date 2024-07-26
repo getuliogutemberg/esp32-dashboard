@@ -277,7 +277,7 @@ const Dashboard = () => {
           />
           {/* deve ficar piscando */}
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "Offline"} `}</span>
+          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)',display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "Offline"} `}</span>
           <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4068 L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Maxima: {maxLuzValue.current} L</span>
           <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Minima: {minLuzValue.current} L</span>
