@@ -253,7 +253,7 @@ const Dashboard = () => {
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           {/* deve ficar piscando */}
-          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "Offline"} `}</span>
+          
           <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "Offline"} `}</span>
           
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
