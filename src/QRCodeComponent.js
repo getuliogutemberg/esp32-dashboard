@@ -87,7 +87,7 @@ const handleDoubleClick = () => {
     
 
     return (
-        <div onDoubleClick={handleDoubleClick} onTouchStart={handleClick} style={{ cursor: 'pointer', position: 'fixed', right: '-195px', bottom: '-195px', margin: '0px', padding: '0px' }}>
+        <div  style={{ cursor: 'pointer', position: 'fixed', right: '-195px', bottom: '-195px', margin: '0px', padding: '0px' }}>
             <QRCode value={window.location.href} size={512} style={{ margin: '0px', padding: '0px' , border: '15px solid #ccc', borderRadius: '10px', transform: 'scale(0.2)'}} />
         </div>
     );
