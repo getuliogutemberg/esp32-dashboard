@@ -268,7 +268,7 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value.luz * 100 / maxLuzValue.current).toFixed(0) + 'L' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
