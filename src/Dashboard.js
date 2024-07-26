@@ -229,7 +229,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + ' %' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
@@ -248,7 +248,7 @@ const Dashboard = () => {
             animate={false}
             animDelay={500}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + ' °C' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
