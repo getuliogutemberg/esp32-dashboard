@@ -1,7 +1,7 @@
 // src/App.js
 import React from 'react';
 import './App.css';
-import Dashboard from './Dashboard';
+import Dashboard from './Dashboard.js';
 import Stream from './Stream.js';
 import QRCodeComponent from './QRCodeComponent.js';
 
