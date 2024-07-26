@@ -146,172 +146,77 @@ const Dashboard = () => {
         // define minUmidade
         const minUmidade = Math.min(...allReadingsRef.current.map(entry => entry.umidade));
         minUmidadeValue.current = minUmidade;
-
+        
+        
       } catch (error) {
         console.error('Erro ao buscar última leitura:', error);
       }
     };
 
-    const interval = setInterval(() => {
-      fetchLastReading();
-    }, 5000);
+    const interval = setInterval(fetchLastReading, 5000); // Busca a cada 5 segundos
 
     return () => clearInterval(interval);
   }, [userZoom]);
 
-  // useEffect(() => {
-  //   socketRef.current = io("https://esp32-data-api-1.onrender.com:3000");
-
-  //   socketRef.current.on('newData', (newData) => {
-  //     allReadingsRef.current = [...allReadingsRef.current, newData];
-  //     if (!userZoom) {
-  //       setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
-  //       setZoomEndIndex(allReadingsRef.current.length - 1);
-  //     }
-
-  //     const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
-  //     maxLuzValue.current = maxLuz;
-  //   });
-
-  //   return () => {
-  //     socketRef.current.disconnect();
-  //   };
-  // }, [userZoom]);
-
-  const handleDeleteData = async () => {
-    const confirmDelete = window.confirm("Os dados serão apagados permanentemente. Deseja continuar?");
-  
-    if (confirmDelete) {
-      try {
-        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
-        allReadingsRef.current = [response.data];
-        lastReadingsRef.current = null;
-        setZoomStartIndex(0);
-        setZoomEndIndex(0);
-        await axios.delete("https://esp32-data-api-1.onrender.com/data");
-        alert('Dados apagados com sucesso.');
-      } catch (error) {
-        console.error('Erro ao apagar dados:', error);
-      }
-    } else {
-      alert('Ação de exclusão cancelada.');
-    }
-  };
-
-  if (allReadingsRef.current.length === 0) {
-    return <div style={{marginRight: '30px'}}>Consultando dados... </div>;
-  }
-
-  const convertMilliseconds = (ms) => {
-    let seconds = Math.floor((ms / 1000) % 60);
-    let minutes = Math.floor((ms / (1000 * 60)) % 60);
-    let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-  
-    return `${hours} horas, ${minutes} minutos e ${seconds} segundos`;
-  };
-
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', margin: '0 auto' }}>
-      <div style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px' }}>
-        {isDataOnline ? 'Online.' : `Offline a ${convertMilliseconds(lastDataDelay)}.`}
-      </div>
-      <div 
-        onClick={handleDeleteData}
-        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer' }}
-      >
-        Apagar dados
-      </div>
-      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap' }}>
-        <div>
-          <h3>Umidade</h3>
-          <GaugeChart id="gauge-humidity" 
-            nrOfLevels={1}
-            animate={false}
-            animDelay={0}
-            animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + ' %' : "Indisponível"} `}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
+    <div className="dashboard-container">
+      <h1>Dashboard de Monitoramento</h1>
+      <button className="zoom-button" onClick={handleZoomButtonClick}>Ver Últimas Leituras</button>
+      <div className="chart-container">
+        <div className="gauge-chart">
+          <h3 className={lastReadingsRef.current.temperatura === maxTemperaturaValue.current ? 'on-fire' : lastReadingsRef.current.temperatura === minTemperaturaValue.current ? 'frozen' : ''}>Temperatura Atual</h3>
+          <GaugeChart id="gauge-chart1" 
+            nrOfLevels={30} 
+            percent={lastReadingsRef.current.temperatura / maxTemperaturaValue.current} 
+            textColor="#000000"
+            formatTextValue={value => `${lastReadingsRef.current.temperatura.toFixed(2)}°C`}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          {/* deve ficar piscando */}
-          <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%' : "Offline"} `}</span>
-         
-          <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
-          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Maxima: {maxLuzValue.current} %</span>
-          <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minLuzValue.current} %</span>
-          </div>
         </div>
-        <div>
-          <h3>Temperatura</h3>
-          <GaugeChart id="gauge-temperature"
-            nrOfLevels={10} 
-            animate={false}
-            animDelay={500}
-            animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + ' °C' : "Indisponível"} `}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
+        <div className="gauge-chart">
+          <h3 className={lastReadingsRef.current.umidade === maxUmidadeValue.current ? 'soaked' : lastReadingsRef.current.umidade === minUmidadeValue.current ? 'dry' : ''}>Umidade Atual</h3>
+          <GaugeChart id="gauge-chart2" 
+            nrOfLevels={30} 
+            percent={lastReadingsRef.current.umidade / maxUmidadeValue.current} 
+            textColor="#000000"
+            formatTextValue={value => `${lastReadingsRef.current.umidade.toFixed(2)}%`}
           />
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          {/* deve ficar piscando */}
-          
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)' ,transition: 'color 0.5s ease-in-out'}}>{allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura} °C` : "Offline"}</span>
-          
-          <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
-          <span style={{ fontSize: '12px',color: "rgba(255, 0, 0, 1)",transition: 'color 0.5s ease-in-out',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima: {maxTemperaturaValue.current} °C</span>
-          <span style={{ fontSize: '12px',color: "rgba(0, 0, 255, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima: {minTemperaturaValue.current} °C</span>
-          </div>
         </div>
-        <div>
-          <h3>Luminosidade</h3>
-          <GaugeChart id="gauge-light"
-            nrOfLevels={20} 
-            animate={false}
-            animDelay={1000}
-            animateDuration={5000}
-            colors={["#FF5F6D", "#FFC371"]} 
-            cornerRadius={3} 
-            arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? (value*maxLuzValue.current/100).toFixed(2) + ' L (' + value + ' %)' : "Indisponível"} `}
-            percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
-            arcsLength={[0.3, 0.7]}
-            arcPadding={0.02}
+        <div className="gauge-chart">
+          <h3 className={lastReadingsRef.current.luz === maxLuzValue.current ? 'shining' : lastReadingsRef.current.luz === minLuzValue.current ? 'dimmed' : ''}>Luminosidade Atual</h3>
+          <GaugeChart id="gauge-chart3" 
+            nrOfLevels={30} 
+            percent={lastReadingsRef.current.luz / maxLuzValue.current} 
+            textColor="#000000"
+            formatTextValue={value => `${lastReadingsRef.current.luz.toFixed(2)} Lux`}
           />
-          {/* deve ficar piscando */}
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
-          <span style={{ fontSize: '12px',color:'rgba(255, 0, 0, 1)',display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "Offline"} `}</span>
-          <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4068 L</span>
-          <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Maxima: {maxLuzValue.current} L</span>
-          <span style={{ fontSize: '12px', color:'rgba(255, 165, 0, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Minima: {minLuzValue.current} L</span>
-          </div>
         </div>
       </div>
-
-      <h2 style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
-
-      <ResponsiveContainer width="100%" height={400}>
-        <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
-          <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }} />
-          <YAxis stroke="#ccc" style={{ fontSize: '14px' }} domain={[0, 100]} />
-          <Tooltip contentStyle={{ fontSize: '20px', background: '#000' }} labelFormatter={(value) => new Date(value).toLocaleTimeString()} offset={100} />
-          <Legend />
-          {/* <Bar  type="monotone" dataKey={(value) => (value.luz * 100 / maxLuzValue.current).toFixed(0)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} /> */}
-          {/* <Line strokeWidth={5} type="monotone" dataKey="umidade" stroke="#8884d8" dot={false} name='Umidade' unit=" %H"  /> */}
-          {/* <Line strokeWidth={5} type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
-          <Bar type="monotone" dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
-          {/* <Area type="monotone" dataKey="temperatura" stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
-          <Bar type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
-          <Line strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz * 100 / maxLuzValue.current).toFixed(0)} formatTextValue={value => `${value} L`} barSize={30} fill="#ffc658" name="Luminosidade" unit=" %" stroke="#ffc658" dot={false} />
-          <Brush
-            startIndex={zoomStartIndex}
-            endIndex={zoomEndIndex}
-            stroke="#8884d8"
-            dataKey="timestamp"
-            tickFormatter={value => new Date(value).toLocaleTimeString()}
-            onChange={handleBrushChange}
-          />
-        </ComposedChart>
-      </ResponsiveContainer>
+      <div className="historical-data">
+        <h2>Histórico de Leituras</h2>
+        <ResponsiveContainer width="100%" height={400}>
+          <ComposedChart data={allReadingsRef.current.slice(zoomStartIndex, zoomEndIndex + 1)}>
+            <CartesianGrid stroke="#f5f5f5" />
+            <XAxis dataKey="timestamp" tickFormatter={(timestamp) => new Date(timestamp).toLocaleTimeString()} />
+            <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
+            <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
+            <Tooltip labelFormatter={(label) => new Date(label).toLocaleString()} />
+            <Legend />
+            <Brush dataKey="timestamp" startIndex={zoomStartIndex} endIndex={zoomEndIndex} onChange={handleBrushChange} />
+            <Line yAxisId="left" type="monotone" dataKey="temperatura" stroke="#ff7300" />
+            <Line yAxisId="left" type="monotone" dataKey="umidade" stroke="#387908" />
+            <Line yAxisId="right" type="monotone" dataKey="luz" stroke="#8884d8" />
+            <Bar yAxisId="left" dataKey="temperatura" fill="#ff7300" />
+          </ComposedChart>
+        </ResponsiveContainer>
+      </div>
+      <div className="logs">
+        <h2>Logs de Status do Dashboard</h2>
+        <ul>
+          <li>Dashboard está {isDataOnline ? 'online' : 'offline'}.</li>
+          <li>Último atraso de dados: {lastDataDelay} ms.</li>
+          <li>Número de usuários visualizando o dashboard: {/* Aqui você pode adicionar a lógica para obter o número de usuários */}</li>
+        </ul>
+      </div>
     </div>
   );
 };
