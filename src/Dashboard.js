@@ -229,11 +229,17 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%H' : "No Data"} `}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
-          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%H' : "Offline"} `}</span>
+          
+          {/* deve ficar piscando */}
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%' : "Offline"} `}</span>
+         
           <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
+          <span style={{ fontSize: '12px', color: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'rgba(0, 0, 255, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Maxima: {maxLuzValue.current} %</span>
+          <span style={{ fontSize: '12px', color: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minLuzValue.current} %</span>
+          
         </div>
         <div>
           <h3>Temperatura</h3>
@@ -249,8 +255,8 @@ const Dashboard = () => {
           <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "Offline"} `}</span>
           
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
-          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima:{maxTemperaturaValue.current}°C</span>
-          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'blue',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima:{minTemperaturaValue.current}°C</span>
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima: {maxTemperaturaValue.current} °C</span>
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'blue',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima: {minTemperaturaValue.current} °C</span>
         </div>
         <div>
           <h3>Luminosidade</h3>
@@ -267,8 +273,12 @@ const Dashboard = () => {
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
           />
-          <span style={{ fontSize: '12px' }}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + 'L' : "Offline"} `}</span>
-          <span style={{ fontSize: '12px' }}>Luminosidade maxima: {maxLuzValue.current}</span>
+          {/* deve ficar piscando */}
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "Offline"} `}</span>
+          <span style={{ fontSize: '12px' }}>Luminosidade maxima: 4068 L</span>
+          <span style={{ fontSize: '12px', color: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'rgba(255, 165, 0, 1)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Maxima: {maxLuzValue.current} L</span>
+          <span style={{ fontSize: '12px', color: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'rgba(255, 165, 0, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].luz && 'none' }}>Minima: {minLuzValue.current} L</span>
+          
         </div>
       </div>
 
