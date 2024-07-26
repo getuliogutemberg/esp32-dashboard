@@ -1,7 +1,8 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import axios from 'axios';
-// import io from 'socket.io-client';
+import QRCodeComponent from './QRCodeComponent.js';
+
 import {
   ComposedChart,
   Line,
@@ -36,6 +37,7 @@ const Dashboard = () => {
   const [lastDataDelay, setLastDataDelay] = useState(0);
   const [isDataOnline, setIsDataOnline] = useState(false);
   const [logs, setLogs] = useState([]);
+  const [openMenu, setOpenMenu] = useState(false);
   // const socketRef = useRef(null);
 
   const handleBrushChange = ({ startIndex, endIndex }) => {
@@ -278,6 +280,87 @@ const Dashboard = () => {
 
   };
 
+  const handleDoubleClick = () => {
+    const canvas = document.querySelector('canvas');
+    const image = canvas.toDataURL('image/png', 1.0);
+  
+    // Abrir a janela menor com a imagem e botões, sem informações adicionais
+    const printWindow = window.open("", "", "width=400,height=200,scrollbars=no,resizable=no,toolbar=no,location=no,directories=no,status=no");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Imprimir QR Code</title>
+          <style>
+            body { display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0; height: 100vh; background-color: white; }
+            img { width: 2.5cm; height: 2.5cm; }
+            button { font-size: 16px; cursor: pointer; padding: 10px 20px; margin: 10px; }
+          </style>
+        </head>
+        <body>
+          <img src="${image}" onclick="window.opener.handleClick()" />
+          <div>
+            <button onclick="window.print()">Imprimir</button>
+            <button onclick="window.close()">Cancelar</button>
+          </div>
+          <script>
+            // Fechar a janela quando ela perder o foco
+            window.addEventListener('blur', function() {
+              window.close();
+            });
+          </script>
+        </body>
+      </html>
+    `);
+    printWindow.document.close();
+  }
+
+  const handleClick = () => {
+    const canvas = document.querySelector('canvas');
+    // Aumente o tamanho do canvas para melhorar a resolução
+    const scale = 4; // Ajuste o fator de escala conforme necessário
+    const width = canvas.width * scale;
+    const height = canvas.height * scale;
+    
+    // Crie um novo canvas com maior resolução
+    const highResCanvas = document.createElement('canvas');
+    highResCanvas.width = width;
+    highResCanvas.height = height;
+    const ctx = highResCanvas.getContext('2d');
+    
+    // Redimensione o conteúdo do canvas original para o novo canvas
+    ctx.drawImage(canvas, 0, 0, width, height);
+
+    const image = highResCanvas.toDataURL('image/png', 1.0);
+
+    // Abrir uma nova janela em tela cheia
+    const fullscreenWindow = window.open("about:blank", "", "fullscreen=yes,menubar=no,scrollbars=no,resizable=no,status=no,toolbar=no,location=no");
+    fullscreenWindow.document.write(`
+      <html>
+        <head>
+          <title>Imprimir QR Code</title>
+          <style>
+            body { display: flex; justify-content: center; align-items: center; margin: 0; height: 100vh; background-color: white; overflow: hidden; }
+            img { width: 100%; height: auto; }
+          </style>
+        </head>
+        <body>
+          <img src="${image}" />
+          <script>
+            // Fechar a janela quando ela perder o foco
+            window.addEventListener('click', function() {
+              window.close();
+            });
+            window.addEventListener('blur', function() {
+            window.close();
+          });
+          </script>
+        </body>
+      </html>
+    `);
+    fullscreenWindow.document.close();
+}
+  
+
   
 
   return (
@@ -285,12 +368,39 @@ const Dashboard = () => {
       <div style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: isDataOnline ? 'green' : 'red', padding: '5px', borderRadius: '5px', left: '10px', top: '10px' }}>
         {isDataOnline ? 'Online.' : `Offline a ${convertMilliseconds(lastDataDelay)}.`}
       </div>
-      <div 
+     
+  <div 
+        title='Menu'
+        onClick={() => setOpenMenu(!openMenu)}
+        style={{ color: openMenu ? 'white':'transparent', fontSize: '14px', position: 'fixed', backgroundColor: openMenu ? '#111' : 'transparent', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer' }}
+      > 
+        Menu
+      </div>
+
+        <div 
         onClick={handleDeleteData}
-        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '10px', cursor: 'pointer' }}
+        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '50px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
       >
         Apagar dados
       </div>
+
+      
+
+      <div 
+        onClick={handleClick}
+        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: '#111', padding: '5px', borderRadius: '5px', right: '10px', top: '90px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
+      >
+        QR Code
+      </div>
+      <div 
+        onClick={handleDoubleClick}
+        style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: '#111', padding: '5px', borderRadius: '5px', right: '10px', top: '130px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
+      >
+        Imprimir QR Code
+      </div>
+
+
+    
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3>Umidade</h3>
@@ -359,7 +469,7 @@ const Dashboard = () => {
       <h2 style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
 
       <ResponsiveContainer width="100%" height={400}>
-        <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 0 }}>
+        <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 20 }}>
           <CartesianGrid strokeDasharray="3 3" />
           <XAxis dataKey="timestamp" tickFormatter={value => new Date(value).toLocaleTimeString()} stroke="#ccc" style={{ fontSize: '14px' }} />
           <YAxis stroke="#8884d8" yAxisId="left1" orientation="left" style={{ fontSize: '14px' }} domain={[minUmidadeValue.current, maxUmidadeValue.current]} unit={' %'} />
@@ -397,6 +507,7 @@ const Dashboard = () => {
         </ul>
       </div>
     </div>
+    {openMenu && <QRCodeComponent />}
     </div>
   );
 };
