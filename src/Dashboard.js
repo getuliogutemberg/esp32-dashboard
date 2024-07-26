@@ -1,7 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
 import GaugeChart from 'react-gauge-chart';
 import axios from 'axios';
-import QRCodeComponent from './QRCodeComponent.js';
+import QRCode from 'qrcode.react';
+
+
 
 import {
   ComposedChart,
@@ -17,7 +19,9 @@ import {
   // Area,
 } from 'recharts';
 
-const Dashboard = () => {
+const Dashboard = ({ apiData, apiLastData }) => {
+
+  
   const lastReadingsRef = useRef(null);
   const allReadingsRef = useRef([{
     timestamp: new Date().getTime(),
@@ -59,7 +63,7 @@ const Dashboard = () => {
   useEffect(() => {
     const fetchInitialData = async () => {
       try {
-        const response = await axios.get("https://esp32-data-api-1.onrender.com/data");
+        const response = await axios.get(apiData);
         allReadingsRef.current = response.data;
         setLogs(prevLogs => [
           ...prevLogs,
@@ -126,9 +130,9 @@ const Dashboard = () => {
     };
     
     fetchInitialData();
+    console.log(apiData);
     
-    
-  }, []);
+  }, [apiData]);
 
   useEffect(() => {
     const fetchLastReading = async () => {
@@ -145,7 +149,7 @@ const Dashboard = () => {
       };
 
       try {
-        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+        const response = await axios.get(apiLastData);
         checkDataDelay(response.data.timestamp);
         if (response.data.timestamp > allReadingsRef.current[allReadingsRef.current.length - 1].timestamp) {
           lastReadingsRef.current = response.data;
@@ -221,38 +225,21 @@ const Dashboard = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [userZoom]);
+  }, [apiLastData, userZoom]);
 
-  // useEffect(() => {
-  //   socketRef.current = io("https://esp32-data-api-1.onrender.com:3000");
-
-  //   socketRef.current.on('newData', (newData) => {
-  //     allReadingsRef.current = [...allReadingsRef.current, newData];
-  //     if (!userZoom) {
-  //       setZoomStartIndex(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
-  //       setZoomEndIndex(allReadingsRef.current.length - 1);
-  //     }
-
-  //     const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
-  //     maxLuzValue.current = maxLuz;
-  //   });
-
-  //   return () => {
-  //     socketRef.current.disconnect();
-  //   };
-  // }, [userZoom]);
+ 
 
   const handleDeleteData = async () => {
     const confirmDelete = window.confirm("Os dados serão apagados permanentemente. Deseja continuar?");
   
     if (confirmDelete) {
       try {
-        const response = await axios.get("https://esp32-data-api-1.onrender.com/data/last");
+        const response = await axios.get(apiLastData);
         allReadingsRef.current = [response.data];
         lastReadingsRef.current = null;
         setZoomStartIndex(0);
         setZoomEndIndex(0);
-        await axios.delete("https://esp32-data-api-1.onrender.com/data");
+        await axios.delete(apiData);
         alert('Dados apagados com sucesso.');
       } catch (error) {
         console.error('Erro ao apagar dados:', error);
@@ -378,6 +365,7 @@ const Dashboard = () => {
       </div>
 
         <div 
+        title='Apagar dados'
         onClick={handleDeleteData}
         style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: 'red', padding: '5px', borderRadius: '5px', right: '10px', top: '50px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
       >
@@ -387,12 +375,14 @@ const Dashboard = () => {
       
 
       <div 
+        title='Visualizar QR Code'
         onClick={handleClick}
         style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: '#111', padding: '5px', borderRadius: '5px', right: '10px', top: '90px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
       >
         QR Code
       </div>
       <div 
+        title='Imprimir QR Code'
         onClick={handleDoubleClick}
         style={{ color: 'white', fontSize: '14px', position: 'fixed', backgroundColor: '#111', padding: '5px', borderRadius: '5px', right: '10px', top: '130px', cursor: 'pointer', display: openMenu ? 'block' : 'none' }}
       >
@@ -402,9 +392,10 @@ const Dashboard = () => {
 
     
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'start', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+        <div title='Medidor de Umidade' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3>Umidade</h3>
           <GaugeChart id="gauge-humidity" 
+          title='Medidor de Umidade' 
             nrOfLevels={1}
             animate={false}
             animDelay={0}
@@ -421,7 +412,8 @@ const Dashboard = () => {
           <span style={{ fontSize: '12px', color: 'rgba(0, 0, 255, 0.5)', display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>Minima: {minUmidadeValue.current} %</span>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+        <div title='Medidor de Temperatura' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3>Temperatura</h3>
           <GaugeChart id="gauge-temperature"
             nrOfLevels={10} 
@@ -441,7 +433,8 @@ const Dashboard = () => {
           <span style={{ fontSize: '12px',color: "rgba(0, 0, 255, 1)",display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima: {minTemperaturaValue.current} °C</span>
           </div>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+
+        <div title='Medidor de Luminosidade' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
           <h3 >Luminosidade</h3>
           <GaugeChart id="gauge-light"
             nrOfLevels={20} 
@@ -466,7 +459,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <h2 style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
+      <h2 title='Leituras' style={{ margin: '20px 0', fontSize: '20px' }}>Leituras {userZoom ? 'em zoom' : 'em tempo real'} {userZoom && <button title='Tempo real' style={{ marginLeft: '10px', fontSize: '14px' }} onClick={handleZoomButtonClick}>Tempo real</button>}</h2>
 
       <ResponsiveContainer width="100%" height={400}>
         <ComposedChart data={allReadingsRef.current} margin={{ top: 0, right: 30, left: 20, bottom: 20 }}>
@@ -507,7 +500,9 @@ const Dashboard = () => {
         </ul>
       </div>
     </div>
-    {openMenu && <QRCodeComponent />}
+    {openMenu && <div  style={{ cursor: 'pointer', position: 'fixed', right: '-195px', bottom: '-195px', margin: '0px', padding: '0px' }}>
+            <QRCode value={window.location.href} size={512} style={{ margin: '0px', padding: '0px' , border: '15px solid #ccc', borderRadius: '10px', transform: 'scale(0.2)'}} />
+        </div>}
     </div>
   );
 };
