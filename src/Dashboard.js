@@ -28,6 +28,11 @@ const Dashboard = () => {
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
   const [userZoom, setUserZoom] = useState(false);
   const maxLuzValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
+  const maxTemperaturaValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
+  const minTemperaturaValue = useRef(0); // Inicializado com 0 para evitar divisão por zero
+  const minLuzValue = useRef(0); // Inicializado com 0 para evitar divisão por zero
+  const minUmidadeValue = useRef(0); // Inicializado com 0 para evitar divisão por zero
+  const maxUmidadeValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
   const [lastDataDelay, setLastDataDelay] = useState(0);
   const [isDataOnline, setIsDataOnline] = useState(false);
   // const socketRef = useRef(null);
@@ -58,6 +63,28 @@ const Dashboard = () => {
         const maxLuz = Math.max(...response.data.map(entry => entry.luz));
 
         maxLuzValue.current = maxLuz;
+
+        // define maxTemperatura
+        const maxTemperatura = Math.max(...response.data.map(entry => entry.temperatura));
+        maxTemperaturaValue.current = maxTemperatura;
+
+        // define maxUmidade
+        const maxUmidade = Math.max(...response.data.map(entry => entry.umidade));
+        maxUmidadeValue.current = maxUmidade;
+
+        // define minTemperatura
+        const minTemperatura = Math.min(...response.data.map(entry => entry.temperatura));
+        minTemperaturaValue.current = minTemperatura;
+
+        // define minLuz
+        const minLuz = Math.min(...response.data.map(entry => entry.luz));
+        minLuzValue.current = minLuz;
+
+        // define minUmidade
+        const minUmidade = Math.min(...response.data.map(entry => entry.umidade));
+        minUmidadeValue.current = minUmidade;
+
+       
 
         // Define zoomStartIndex e zoomEndIndex
         if (response.data.length > 10) {
@@ -99,6 +126,27 @@ const Dashboard = () => {
         // define maxLuz 
         const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
         maxLuzValue.current = maxLuz;
+
+        // define maxTemperatura
+        const maxTemperatura = Math.max(...allReadingsRef.current.map(entry => entry.temperatura));
+        maxTemperaturaValue.current = maxTemperatura;
+
+        // define maxUmidade
+        const maxUmidade = Math.max(...allReadingsRef.current.map(entry => entry.umidade));
+        maxUmidadeValue.current = maxUmidade;
+
+        // define minTemperatura
+        const minTemperatura = Math.min(...allReadingsRef.current.map(entry => entry.temperatura));
+        minTemperaturaValue.current = minTemperatura;
+
+        // define minLuz
+        const minLuz = Math.min(...allReadingsRef.current.map(entry => entry.luz));
+        minLuzValue.current = minLuz;
+
+        // define minUmidade
+        const minUmidade = Math.min(...allReadingsRef.current.map(entry => entry.umidade));
+        minUmidadeValue.current = minUmidade;
+
       } catch (error) {
         console.error('Erro ao buscar última leitura:', error);
       }
@@ -181,9 +229,10 @@ const Dashboard = () => {
             animate={false}
             animDelay={0}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? "busy" : value} %H`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%H' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].umidade / 100}
           />
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].umidade && 'none' }}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + '%H' : "Offline"} `}</span>
           <span style={{ fontSize: '12px' }}>Umidade maxima: 100 %</span>
         </div>
         <div>
@@ -193,10 +242,15 @@ const Dashboard = () => {
             animate={false}
             animDelay={500}
             animateDuration={5000}
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? "busy" : value} °C`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].temperatura / 100}
           />
+          {/* deve ficar piscando */}
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' ,transition: 'color 0.5s ease-in-out'}}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].temperatura ? value + '°C' : "Offline"} `}</span>
+          
           <span style={{ fontSize: '12px' }}>Temperatura maxima: 100 °C</span>
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'red',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Maxima:{maxTemperaturaValue.current}°C</span>
+          <span style={{ fontSize: '12px',color: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'blue',display: !allReadingsRef.current[allReadingsRef.current.length - 1].temperatura && 'none' }}>Minima:{minTemperaturaValue.current}°C</span>
         </div>
         <div>
           <h3>Luminosidade</h3>
@@ -208,11 +262,12 @@ const Dashboard = () => {
             colors={["#FF5F6D", "#FFC371"]} 
             cornerRadius={3} 
             arcWidth={0.2} 
-            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? "busy" : value}`}
+            formatTextValue={value => `${allReadingsRef.current[allReadingsRef.current.length - 1].luz ? value + 'L' : "No Data"} `}
             percent={allReadingsRef.current[allReadingsRef.current.length - 1].luz / maxLuzValue.current} 
             arcsLength={[0.3, 0.7]}
             arcPadding={0.02}
           />
+          <span style={{ fontSize: '12px' }}>{value => `${allReadingsRef.current[allReadingsRef.current.length - 1].umidade ? value + 'L' : "Offline"} `}</span>
           <span style={{ fontSize: '12px' }}>Luminosidade maxima: {maxLuzValue.current}</span>
         </div>
       </div>
