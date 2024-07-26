@@ -6,7 +6,21 @@ function QRCodeComponent() {
 
   const handleClick = () => {
     const canvas = document.querySelector('canvas');
-    const image = canvas.toDataURL('image/png', 1.0);
+    // Aumente o tamanho do canvas para melhorar a resolução
+    const scale = 4; // Ajuste o fator de escala conforme necessário
+    const width = canvas.width * scale;
+    const height = canvas.height * scale;
+    
+    // Crie um novo canvas com maior resolução
+    const highResCanvas = document.createElement('canvas');
+    highResCanvas.width = width;
+    highResCanvas.height = height;
+    const ctx = highResCanvas.getContext('2d');
+    
+    // Redimensione o conteúdo do canvas original para o novo canvas
+    ctx.drawImage(canvas, 0, 0, width, height);
+
+    const image = highResCanvas.toDataURL('image/png', 1.0);
 
     // Abrir uma nova janela em tela cheia
     const fullscreenWindow = window.open("about:blank", "", "fullscreen=yes,menubar=no,scrollbars=no,resizable=no,status=no,toolbar=no,location=no");
@@ -26,6 +40,9 @@ function QRCodeComponent() {
             window.addEventListener('click', function() {
               window.close();
             });
+            window.addEventListener('blur', function() {
+            window.close();
+          });
           </script>
         </body>
       </html>
@@ -44,7 +61,7 @@ const handleDoubleClick = () => {
         <title>Imprimir QR Code</title>
         <style>
           body { display: flex; flex-direction: column; justify-content: center; align-items: center; margin: 0; height: 100vh; background-color: white; }
-          img { width: 2.5cm; height: 2.5cm; cursor: pointer; }
+          img { width: 2.5cm; height: 2.5cm; }
           button { font-size: 16px; cursor: pointer; padding: 10px 20px; margin: 10px; }
         </style>
       </head>
@@ -70,8 +87,8 @@ const handleDoubleClick = () => {
     
 
     return (
-        <div onDoubleClick={handleDoubleClick} onAuxClick={handleClick} style={{ cursor: 'pointer', position: 'fixed', right: '0px', bottom: '0px', margin: '0px', padding: '0px' }}>
-            <QRCode value={window.location.href} size={50} style={{ margin: '0px', padding: '0px' , border: '5px solid #ccc', borderRadius: '10px'}} />
+        <div onDoubleClick={handleDoubleClick} onAuxClick={handleClick} style={{ cursor: 'pointer', position: 'fixed', right: '-235px', bottom: '-240px', margin: '0px', padding: '0px' }}>
+            <QRCode value={window.location.href} size={512} style={{ margin: '0px', padding: '0px' , border: '5px solid #ccc', borderRadius: '10px', transform: 'scale(0.1)'}} />
         </div>
     );
 }
