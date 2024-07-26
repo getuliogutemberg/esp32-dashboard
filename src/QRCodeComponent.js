@@ -14,7 +14,7 @@ function QRCodeComponent() {
               <title>Imprimir QR Code</title>
               <style>
                 @page { size: A4; margin: 0; }
-                body { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin: 0; height: 100vh; }
+                body { display: flex; flex-direction: column; justify-content: space-between; align-items: center; margin: 0; height: 200px; }
                 img { width: 2.5cm; height: 2.5cm; }
                 button {  font-size: 16px; cursor: pointer; padding: 10px 20px;margin: 10px; }
               </style>
