@@ -3,6 +3,7 @@ import React from 'react';
 import './App.css';
 import Dashboard from './Dashboard';
 import Stream from './Stream.js';
+import QRCodeComponent from './QRCodeComponent.js';
 
 
 function App() {
@@ -16,8 +17,10 @@ function App() {
 
         <Stream />
         <Dashboard />
+
       </div>
       </header>
+      <QRCodeComponent />
     </div>
   );
 }

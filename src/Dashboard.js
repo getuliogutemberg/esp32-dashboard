@@ -35,6 +35,7 @@ const Dashboard = () => {
   const maxUmidadeValue = useRef(1); // Inicializado com 1 para evitar divisão por zero
   const [lastDataDelay, setLastDataDelay] = useState(0);
   const [isDataOnline, setIsDataOnline] = useState(false);
+  const [logs, setLogs] = useState([]);
   // const socketRef = useRef(null);
 
   const handleBrushChange = ({ startIndex, endIndex }) => {
@@ -58,32 +59,54 @@ const Dashboard = () => {
       try {
         const response = await axios.get("https://esp32-data-api-1.onrender.com/data");
         allReadingsRef.current = response.data;
-
+        setLogs(prevLogs => [
+          ...prevLogs,
+          `Carregando historicos!`
+        ]);
         // define maxLuz
         const maxLuz = Math.max(...response.data.map(entry => entry.luz));
-
         maxLuzValue.current = maxLuz;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Luz maxima: ${maxLuz}`
+        // ]);
 
         // define maxTemperatura
         const maxTemperatura = Math.max(...response.data.map(entry => entry.temperatura));
         maxTemperaturaValue.current = maxTemperatura;
-
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Temperatura maxima: ${maxTemperatura}`
+        // ]);
         // define maxUmidade
         const maxUmidade = Math.max(...response.data.map(entry => entry.umidade));
         maxUmidadeValue.current = maxUmidade;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Umidade maxima: ${maxUmidade}`
+        // ])
 
         // define minTemperatura
         const minTemperatura = Math.min(...response.data.map(entry => entry.temperatura));
         minTemperaturaValue.current = minTemperatura;
-
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Temperatura minima: ${minTemperatura}`
+        // ])
         // define minLuz
         const minLuz = Math.min(...response.data.map(entry => entry.luz));
         minLuzValue.current = minLuz;
-
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Luz minima: ${minLuz}`
+        // ])
         // define minUmidade
         const minUmidade = Math.min(...response.data.map(entry => entry.umidade));
         minUmidadeValue.current = minUmidade;
-
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Umidade minima: ${minUmidade}`
+        // ])
        
 
         // Define zoomStartIndex e zoomEndIndex
@@ -93,6 +116,10 @@ const Dashboard = () => {
         } 
       } catch (error) {
         console.error('Erro ao buscar todas as leituras:', error);
+        setLogs(prevLogs => [
+          ...prevLogs,
+          `Erro ao buscar todas as leituras: ${error.message}`
+        ]);
       }
     };
     
@@ -109,6 +136,10 @@ const Dashboard = () => {
         const lastDataDelay = now - timestampDate;
         setLastDataDelay(lastDataDelay);
         setIsDataOnline(lastDataDelay <= 20000);
+        lastDataDelay > 20000 && setLogs(prevLogs => [
+          ...prevLogs,
+           `O servidor parece estar offline`
+        ]);
       };
 
       try {
@@ -117,6 +148,10 @@ const Dashboard = () => {
         if (response.data.timestamp > allReadingsRef.current[allReadingsRef.current.length - 1].timestamp) {
           lastReadingsRef.current = response.data;
           allReadingsRef.current = [...allReadingsRef.current, response.data];
+          setLogs(prevLogs => [
+            ...prevLogs,
+            `Nova leitura recebida: Umidade: ${response.data.umidade}, Temperatura: ${response.data.temperatura}, Luz: ${response.data.luz}`
+          ]);
         }
         
         if (allReadingsRef.current.length && !userZoom) {
@@ -126,29 +161,56 @@ const Dashboard = () => {
         // define maxLuz 
         const maxLuz = Math.max(...allReadingsRef.current.map(entry => entry.luz));
         maxLuzValue.current = maxLuz;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Maxima Luz: ${maxLuz}`
+        // ]);
 
         // define maxTemperatura
         const maxTemperatura = Math.max(...allReadingsRef.current.map(entry => entry.temperatura));
         maxTemperaturaValue.current = maxTemperatura;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Maxima Temperatura: ${maxTemperatura}`
+        // ]);
 
         // define maxUmidade
         const maxUmidade = Math.max(...allReadingsRef.current.map(entry => entry.umidade));
         maxUmidadeValue.current = maxUmidade;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Maxima umidade: ${maxUmidade}`
+        // ]);
 
         // define minTemperatura
         const minTemperatura = Math.min(...allReadingsRef.current.map(entry => entry.temperatura));
         minTemperaturaValue.current = minTemperatura;
-
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Minima temperatura: ${minTemperatura}`
+        // ]);
         // define minLuz
         const minLuz = Math.min(...allReadingsRef.current.map(entry => entry.luz));
         minLuzValue.current = minLuz;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Minima luz: ${minLuz}`
+        // ]);
 
         // define minUmidade
         const minUmidade = Math.min(...allReadingsRef.current.map(entry => entry.umidade));
         minUmidadeValue.current = minUmidade;
+        // setLogs(prevLogs => [
+        //   ...prevLogs,
+        //   `Minima umidade: ${minUmidade}`
+        // ]);
 
       } catch (error) {
         console.error('Erro ao buscar última leitura:', error);
+        setLogs(prevLogs => [
+          ...prevLogs,
+          `Erro ao buscar último leitura: ${error.message}`
+        ]);
       }
     };
 
@@ -199,16 +261,24 @@ const Dashboard = () => {
   };
 
   if (allReadingsRef.current.length === 0) {
+    setLogs(prevLogs => [
+      ...prevLogs,
+      `Nenhum dado encontrado. Por favor, aguarde...`
+    ]);
     return <div style={{marginRight: '30px'}}>Consultando dados... </div>;
+
   }
 
   const convertMilliseconds = (ms) => {
     let seconds = Math.floor((ms / 1000) % 60);
     let minutes = Math.floor((ms / (1000 * 60)) % 60);
     let hours = Math.floor((ms / (1000 * 60 * 60)) % 24);
-  
+   
     return `${hours} horas, ${minutes} minutos e ${seconds} segundos`;
+
   };
+
+  
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', flexWrap: 'wrap', margin: '0 auto' }}>
@@ -317,6 +387,16 @@ const Dashboard = () => {
           />
         </ComposedChart>
       </ResponsiveContainer>
+      <div style={{ position: 'fixed', display: 'flex', justifyContent: 'start', alignItems: 'center', bottom: '0px', left: '0px', width: '100%', margin: '0px', background: '#000', padding: '0px', borderRadius: '0px', color: '#fff', fontSize: '10px', textAlign: 'start', overflow: 'hidden' }}>
+      {/* <h3 style={{ margin: '5px 0px', padding: '0px 10px' ,background: '#000' ,color: '#fff',width: '30px',zIndex: '1'}}>Logs: </h3> */}
+      <div style={{ whiteSpace: 'nowrap', display: 'inline-block', animation: 'scroll-infinite  50s linear infinite' }}>
+        <ul style={{margin: '5px 0px' , listStyle: 'none', padding: '0px', display: 'flex', justifyContent: 'start', alignItems: 'center', flexWrap: 'wrap', gap: '10px',width: '100vw' }}>
+          {logs.map((log, index) => (
+            index === logs.length - 1 && <li key={index} style={{ color: '#fff', marginRight: '50px', display: 'inline' }}>{log}</li>
+          ))}
+        </ul>
+      </div>
+    </div>
     </div>
   );
 };
