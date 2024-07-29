@@ -59,9 +59,7 @@ function App() {
     const handleMouseMove = (event) => {
       const x = event.clientX;
       const y = event.clientY;
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'mousemove', x, y }));
-      }
+      sendData('mousemove', { x, y });
     };
   
     // Enviar eventos de clique
@@ -74,7 +72,7 @@ function App() {
   
     // Enviar eventos de scroll
     const handleScroll = (event) => {
-      const x = window.scrollX;
+      const x = window.scrollX ;
       const y = window.scrollY;
       console.log(`Scroll registrado em: X: ${x}, Y: ${y}`);
       sendData('scroll', { x, y });
@@ -129,8 +127,8 @@ function App() {
           <Stream description={description} features={features} />
           <Dashboard apiData={apiData} apiLastData={apiLastData} />
         </div>
-        {positions.map(({ id, x, y }) => (
-          <div key={id} style={{ position: 'absolute', left: x, top: y, backgroundColor: 'red', width: 10, height: 10, borderRadius: '50%' }}>
+        {positions.map(({ id, x, y,click,scroll,scrollX,scrollY}) => (
+          <div key={id} style={{ position: 'absolute', left: x + scrollX, top: y + scrollY, backgroundColor: scroll ? 'green' :'red', width: 10, height: 10, borderRadius: '50%',scale: click ? 2 : 1 , transition: 'all 0.3s ease',}}>
             {id}
           </div>
         ))}
