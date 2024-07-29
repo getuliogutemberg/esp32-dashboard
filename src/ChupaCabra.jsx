@@ -1,8 +1,10 @@
+const socket = new WebSocket('ws://localhost:3001');
+
  document.addEventListener('mousemove', function(event) {
     const x = event.clientX;
     const y = event.clientY;
     console.log(`Movimento do mouse: X: ${x}, Y: ${y}`);
-    
+    socket.emit('mousemove', { x, y });
     // Enviar dados para o servidor ou processar conforme necessário
     // fetch('https://your-analytics-endpoint.com/mousemove', {
     //   method: 'POST',
@@ -15,6 +17,7 @@
     const x = event.clientX;
     const y = event.clientY;
     console.log(`Clique registrado em: X: ${x}, Y: ${y}`);
+    socket.emit('click', { x, y });
     
     // Enviar dados para o servidor ou processar conforme necessário
     // fetch('https://your-analytics-endpoint.com/clicks', {
@@ -28,7 +31,7 @@
     const x = event.clientX;
     const y = event.clientY;
     console.log(`Scroll registrado em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('scroll', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/scrolls', {
     //   method: 'POST',
@@ -40,7 +43,7 @@
   document.addEventListener('keydown', function(event) {
     const key = event.key;
     console.log(`Tecla pressionada: ${key}`);
-    
+    socket.emit('keydown', { key });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/keypresses', {
     //   method: 'POST',
@@ -52,7 +55,8 @@
   document.addEventListener('keyup', function(event) {
     const key = event.key;
     console.log(`Tecla liberada: ${key}`);
-    
+    socket.emit('keyup', { key });
+    socket.emit('keyup', { key });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/keyup', {
     //   method: 'POST',
@@ -66,7 +70,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque registrado em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchstart', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touches', {
     //   method: 'POST',
@@ -80,7 +84,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque liberado em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchend', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touchend', {
     //   method: 'POST',
@@ -94,7 +98,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque movido em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchmove', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touchmove', {
     //   method: 'POST',
@@ -108,7 +112,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque cancelado em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchcancel', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touchcancel', {
     //   method: 'POST',
@@ -122,7 +126,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque deixado em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchleave', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touchleave', {
     //   method: 'POST',
@@ -136,7 +140,7 @@
     const x = touch.clientX;
     const y = touch.clientY;
     console.log(`Toque entre em: X: ${x}, Y: ${y}`);
-    
+    socket.emit('touchenter', { x, y });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/touchenter', {
     //   method: 'POST',
@@ -150,7 +154,7 @@
     const y = event.clientY;
     console.log(`Clique registrado em: X: ${x}, Y: ${y}, clique em : ${event.target.title}`);
     // console.log(event);
-    
+    socket.emit('div_click', { x, y, title: event.target.title });
     // Enviar dados para o servidor ou processar conforme você desejar
     // fetch('https://your-analytics-endpoint.com/dblclick', {
     //   method: 'POST',

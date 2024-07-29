@@ -25,9 +25,9 @@ const Dashboard = ({ apiData, apiLastData }) => {
   const lastReadingsRef = useRef(null);
   const allReadingsRef = useRef([{
     timestamp: new Date().getTime(),
-    luz: NaN,
-    temperatura: NaN, 
-    umidade: NaN ,
+    umidade: 0,
+    temperatura: 0,
+    luz: 0
   }]);
   const [zoomStartIndex, setZoomStartIndex] = useState(allReadingsRef.current.length > 10 ? allReadingsRef.current.length - 10 : 0);
   const [zoomEndIndex, setZoomEndIndex] = useState(0);
@@ -236,6 +236,9 @@ const Dashboard = ({ apiData, apiLastData }) => {
       try {
         const response = await axios.get(apiLastData);
         allReadingsRef.current = [response.data];
+       
+     
+
         lastReadingsRef.current = null;
         setZoomStartIndex(0);
         setZoomEndIndex(0);
@@ -478,8 +481,8 @@ const Dashboard = ({ apiData, apiLastData }) => {
           {/* <Line strokeWidth={5} type="monotone" dataKey="temperatura" stroke="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
           <Bar yAxisId="left1" type="monotone"  dataKey="umidade" barSize={20}  stroke="#8884d8" fill="#8884d8" name='Umidade' unit=" %H" dot={false} />
           {/* <Area type="monotone" dataKey="temperatura" stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" /> */}
-          <Bar yAxisId="left2" type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C" />
-          <Line yAxisId="right1" strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz).toFixed(2)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" L" stroke="#ffc658" dot={false} />
+          <Bar yAxisId="left2" type="monotone" dataKey="temperatura" barSize={20} stroke="#82ca9d" fill="#82ca9d" dot={false} name='Temperatura' unit=" °C"   />
+          <Line yAxisId="right1" strokeWidth={5} type="monotone" dataKey={(value) =>(value.luz)} barSize={30} fill="#ffc658" name="Luminosidade" unit=" L" stroke="#ffc658" dot={false}/>
           <Brush
             startIndex={zoomStartIndex}
             endIndex={zoomEndIndex}

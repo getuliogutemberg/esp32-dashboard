@@ -15,6 +15,7 @@
     "react-gauge-chart": "^0.5.1",
     "react-scripts": "5.0.1",
     "react-slick": "^0.30.2",
+    "react-websocket": "^2.1.0",
     "recharts": "^2.12.7",
     "slick-carousel": "^1.8.1",
     "socket.io-client": "^4.7.5",
