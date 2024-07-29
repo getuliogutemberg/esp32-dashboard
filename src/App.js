@@ -17,8 +17,8 @@ function App() {
 
   useEffect(() => {
     // Conectar ao servidor WebSocket
-    const ws = new WebSocket('ws://esp32-data-api-1.onrender.com');
-    // const ws = new WebSocket('ws://localhost:3001');
+    const ws = new WebSocket('ws://esp32-data-api-1.onrender.com/ws');
+    // const ws = new WebSocket('ws://localhost:3001/ws');
     
     // Evento de conexão estabelecida
     ws.addEventListener('open', function(event) {
